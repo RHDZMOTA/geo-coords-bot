@@ -150,10 +150,10 @@ class EntryManager(object):
             for i in range(n_responses):
                 ro = ResponseObject(
                     sender=element["sender"],
-                    content=element["responses"][i]["content"],
-                    content_type=element["responses"][i]["content-type"],
-                    quick_reply_id="" if i != n_responses else element["quick_reply"],
-                    complement_info=element["responses"][i]["complement-info"]
+                    content=element["responses"][i].get("content"),
+                    content_type=element["responses"][i].get("content-type"),
+                    quick_reply_id="" if i != (n_responses - 1) else element["quick_reply"],
+                    complement_info=element["responses"][i].get("complement-info")
                 )
                 send_message(ro)
                 messages.append(ro.jsonify())
@@ -216,26 +216,6 @@ class ConversationAgent(object):
             "content-type": content_type,
             "complement-info": complement_info
         }
-
-
-class AttachmentResponses(object):
-
-    def __init__(self, attachment_dict):
-        self.attachment_dict = attachment_dict
-        self.content = None
-        self.content_type = None
-        self.quick_reply_id = None
-        self.complement_info = None
-
-    def generate(self):
-        self.generic()
-        return self.content, self.content_type, self.quick_reply_id, self.complement_info
-
-    def generic(self):
-        self.content = ["Nice " + str(self.attachment_dict[0]['type'])]
-        self.content_type = ["text"]
-        self.quick_reply_id = "main_menu"
-        self.complement_info = [None]
 
 
 class TextResponses(object):
@@ -342,11 +322,30 @@ class PayloadResponses(object):
             self.complement_info = [None]
 
 
+class AttachmentResponses(object):
+
+    def __init__(self, attachment_dict):
+        self.attachment_dict = attachment_dict
+        self.content = None
+        self.content_type = None
+        self.quick_reply_id = None
+        self.complement_info = None
+
+    def generate(self):
+        self.generic()
+        return self.content, self.content_type, self.quick_reply_id, self.complement_info
+
+    def generic(self):
+        self.content = ["Nice " + str(self.attachment_dict[0]['type'])]
+        self.content_type = ["text"]
+        self.quick_reply_id = "main_menu"
+        self.complement_info = [None]
+
+
 class QuickReplier(object):
 
-    def __init__(self, quick_reply=""):
+    def __init__(self, quick_reply):
         self.response = None
-        self.reply_type = None
         self.reply_type = quick_reply
         self.generate_quick_reply()
 
