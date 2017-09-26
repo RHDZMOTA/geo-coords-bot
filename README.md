@@ -6,25 +6,29 @@ FB-Messenger Bot.
 
 ## Setup
 
-1. Create a 
-
-2. Create a virtuale environment.
+1. Create a virtuale environment.
 * `virtualenv -p /usr/bin/python2.7 venv`
 * `source activate venv`
 
-3. Install requirements.
-* `pip install -r requirements.txt`
+2. Install requirements.
+* `pip install --upgrade -t lib -r requirements.txt`
+
+3. Run setup script.
+* `python setup.py`
 
 ## Usage
 
-1. Run the local simulation by using:
-* `python main.py`
+Using pure Flask:
+* `source activate venv`
+* `python run.py`
 
-2. Use the Google Cloud app dev server:
-* `to do`
+Using Google App Server:
+* `source activate venv`
+* `dev_appserver.py app.yaml`
 
-3. Upload to cloud:
-* `to do`
+Upload to production:
+* `gcloud app deploy --project geo-coords-bot`
 
+## TODO
 
 [tbd]
