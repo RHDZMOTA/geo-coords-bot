@@ -1,20 +1,16 @@
 from settings import config
 import json
 import requests
-#import requests_toolbelt.adapters.appengine
-#from google.appengine.api import urlfetch
-
-#requests_toolbelt.adapters.appengine.monkeypatch()
 
 
 def send_message(response_object):
     params = {"access_token": config.PAGE_ACCESS_TOKEN}
     headers = {"Content-Type": "application/json"}
     data = json.dumps(response_object.jsonify())
-    #r = requests.post("https://graph.facebook.com/v2.6/me/messages",
-    #                  params=params,
-    #                  headers=headers,
-    #                  data=data)
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages",
+                      params=params,
+                      headers=headers,
+                      data=data)
 
 
 class ResponseObject(object):
@@ -234,15 +230,6 @@ class AttachmentResponses(object):
         return self.content, self.content_type, self.quick_reply_id, self.complement_info
 
     def respond_image_url(self):
-        #def get_request(url, params):
-        #    url = url + "?"
-        #    for key in params:
-        #        url += ("" if url[-1] == "?" else "&") + str(key) + "=" + str(params.get(key))
-        #    try:
-        #        result = urlfetch.fetch(url).content
-        #    except urlfetch.Error:
-        #        result = None
-        #    return result
 
         if "image" in str(self.attachment_dict[0]['type']):
             image_url = str(self.attachment_dict[0]['payload'].get("url"))
@@ -254,27 +241,11 @@ class AttachmentResponses(object):
                         "file_url": image_url
                     })
                 )
-                ocr_results = str(r.json())
+                ocr_results = str(r.json().get("text"))
             except requests.exceptions.ConnectionError:
-                ocr_results = "Connection Error."
-            #try:
-                #response = get_request(
-                #    url="https://rhdzmota-cloud-storage.herokuapp.com/cloud-vision/google-dropbox-ocr",
-                #    params={
-                #        "file_url": image_url
-                #    }
-                #)
-                #r = requests.post(
-                #    url="https://rhdzmota-cloud-storage.herokuapp.com/cloud-vision/google-dropbox-ocr",
-                #    headers={"Content-Type": "application/json"},
-                #    data=json.dumps({
-                #        "file_url": image_url
-                #    })
-                #)
-                #ocr_results = str(r.json())
-            #except Exception as e:
-                #ocr_results = "Looks like G-OCR is not working. Here you go: " + image_url
-                #print (str(e))
+                ocr_results = "Connection Error. And this is your photo: " + image_url
+            except Exception as e:
+                ocr_results = "Unknown Error. But hey, this url takes you to your photo: " + image_url
 
             self.content = [ocr_results]
             self.content_type = ["text"]

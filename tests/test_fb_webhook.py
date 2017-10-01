@@ -126,7 +126,7 @@ headers = {"Content-Type": "application/json"}
 
 url1 = "https://geo-coords-bot.appspot.com/fb-webhook/geo-coords-bot"
 url2 = "http://localhost:8080/fb-webhook/geo-coords-bot"
-r = requests.post(url2,
+r = requests.post(url1,
                       params=params,
                       headers=headers,
                       data=json.dumps(example_data3))
