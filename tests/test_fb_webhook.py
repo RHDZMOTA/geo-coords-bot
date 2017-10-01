@@ -101,19 +101,54 @@ example_data2 = {'object': 'page', 'entry':
             'sender': {'id': '1445499585482198'}}],
       'time': 1506401208640}]}
 
+fbex = "https://scontent.xx.fbcdn.net/v/t35.0-12/22218165_10156801129279966_787741130_o.png?_nc_ad=z-m&_nc_cid=0&oh=e3755cff6f9840e9423ecd7a8e091133&oe=59D31EF3"
+
+example_data3 = {'object': 'page', 'entry':
+    [{'id': '118754562014506', 'messaging':
+        [{'message': {
+            "mid":"mid.1458696618141:b4ef9d19ec21086067",
+            "attachments": [
+                {
+                    "type": "image",
+                    "payload": {
+                        "url": fbex
+                    }
+                }
+            ]
+        },
+            'recipient': {'id': '118754562014506'},
+            'timestamp': 1506401208411,
+            'sender': {'id': '1445499585482198'}}],
+      'time': 1506401208640}]}
+
 params = {"access_token": config.PAGE_ACCESS_TOKEN}
 headers = {"Content-Type": "application/json"}
 
 url1 = "https://geo-coords-bot.appspot.com/fb-webhook/geo-coords-bot"
 url2 = "http://localhost:8080/fb-webhook/geo-coords-bot"
-
 r = requests.post(url2,
                       params=params,
                       headers=headers,
-                      data=json.dumps(example_data2))
+                      data=json.dumps(example_data3))
 print(r.text)
 
 
+attachment_dict = [
+                {
+                    "type": "image",
+                    "payload": {
+                        "url": fbex
+                    }
+                }
+            ]
+from util.util import AttachmentResponses
+AR = AttachmentResponses(attachment_dict)
+
+AR.generate()
+
+
+EM = EntryManager(example_data3["entry"][0])
+EM.send_messages()
 
 
 with open('file.html', 'w') as f:
