@@ -35,7 +35,7 @@ class PostbackButton(SerializableModel):
 # Single Response
 
 class SingleResponse(SerializableModel):
-    content = db.StringProperty(required=True)
+    content = db.StringProperty(required=True, multiline=True)
     content_type = db.StringProperty(required=True)
     complement_info = db.StringProperty(required=True)
 

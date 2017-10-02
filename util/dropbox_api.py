@@ -1,4 +1,9 @@
 import requests
+import json
+from google.appengine.api import urlfetch
+
+urlfetch.set_default_fetch_deadline(60)
+
 
 class DropBoxFileManager(object):
 
@@ -20,6 +25,10 @@ class DropBoxFileManager(object):
                 "upload_file_path": self.base_dir
             }
         )
+        #response = urlfetch.fetch(
+        #    url=self.upload_url+"?file_name="+self.file_name+"&file_url="+self.file_url+"&upload_file_path="+self.base_dir
+        #) #json.loads(r.content)
+        #print (str(response.content))
 
     def get_temporal_url(self):
         response = requests.get(
@@ -29,7 +38,11 @@ class DropBoxFileManager(object):
                 "file_path": self.base_dir
             }
         )
-        return response.json().get("url")
+        #response = urlfetch.fetch(
+        #    url=self.download_url + "?file_name=" + self.file_name + "&file_path=" + self.base_dir,
+        #    method=urlfetch.GET
+        #)  # json.loads(r.content)
+        return response.json().get("url") # eval(str(json.loads(response.content))).get("url") #
 
     def next_index(self):
         response = requests.get(self.download_url + self.base_dir).json()

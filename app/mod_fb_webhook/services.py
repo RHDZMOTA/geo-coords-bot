@@ -1,9 +1,13 @@
 from settings import config
-from app.mod_fb_webhook.models import QuickText, QuickReply, ResponsePacket, SingleResponse, TextMessage, ImageMessage, MessageInfo
+from app.mod_fb_webhook.models import QuickText, QuickReply, ResponsePacket, SingleResponse, \
+    TextMessage, ImageMessage, MessageInfo
+from google.appengine.api import urlfetch
 from flask import jsonify
 from util.cloud_vision import OCR
 import requests
 import json
+
+urlfetch.set_default_fetch_deadline(60)
 
 
 class FacebookWebHook(object):
@@ -181,6 +185,7 @@ class AnythingElseResponses(object):
 
 # Attachment Responses
 
+
 class AttachmentResponses(object):
 
     def __init__(self, attachment_dict):
@@ -196,25 +201,47 @@ class AttachmentResponses(object):
 
         if "image" in str(self.attachment_dict[0]['type']):
             image_url = str(self.attachment_dict[0]['payload'].get("url"))
-
+            #ocr_results = OCR.get_text_from_url(image_url)
             try:
                 ocr_results = OCR.get_text_from_url(image_url)
             except Exception as e:
-                ocr_results = None
+                ocr_results = None #"Error: " + str(e)
+
             if ocr_results is None:
                 try:
-                    r = requests.post(
+                    r = urlfetch.fetch(
                         url="https://rhdzmota-cloud-storage.herokuapp.com/cloud-vision/google-dropbox-ocr",
                         headers={"Content-Type": "application/json"},
-                        data=json.dumps({
+                        method='POST',
+                        payload=json.dumps({
                             "file_url": image_url
-                        })
-                    )
-                    ocr_results = str(r.json().get("text"))
+                        }))
+                    try:
+                        ocr_results = str(json.loads(r.content))
+                    except Exception:
+                        ocr_results = str(r.content)
+
+                    ocr_results = ocr_results.split("text': u'")[-1]\
+                        .replace("'}", "")\
+                        .replace("\\n", "\n")\
+                        .replace("\\u", "") if "text" in ocr_results else ocr_results
+                    ocr_results = ocr_results if len(ocr_results) > 4 else "String problems (line 223)."
+
+
+                    #r = requests.post(
+                    #    url="https://rhdzmota-cloud-storage.herokuapp.com/cloud-vision/google-dropbox-ocr",
+                    #    headers={"Content-Type": "application/json"},
+                    #    data=json.dumps({
+                    #        "file_url": image_url
+                    #    }),
+                    #    timeout=5
+                    #)
+                    #ocr_results = str(r.json().get("text"))
                 except requests.exceptions.ConnectionError:
                         ocr_results = "Connection Error. Your photo: " + image_url
                 except Exception as e:
-                    ocr_results = "Unknown Error. But hey, this url takes you to your photo: " + image_url
+                    #ocr_results = "Unknown Error. But hey, this url takes you to your photo: " + image_url
+                    ocr_results = str(e)
 
             self.response_packet = ResponsePacket(
                 quick_reply_id="main_menu",
@@ -280,7 +307,7 @@ class PayloadResponses(object):
                         complement_info="None"
                     ),
                     SingleResponse(
-                        content="punk",
+                        content="Again",
                         content_type="text",
                         complement_info="None"
                     )
