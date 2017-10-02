@@ -18,7 +18,7 @@ url = "http://localhost:8080/fb-webhook/geo-coords-bot"
 r = requests.get(url)
 
 
-from util.util import EntryManager, ResponseObject
+#from util.uti5l import EntryManager, ResponseObject
 from settings import config
 
 # "10155150527234966" "642274965"
@@ -90,6 +90,18 @@ example_data2 = {'object': 'page', 'entry':
             'sender': {'id': '1445499585482198'}}],
       'time': 1506401208640}]}
 
+example_data22 = {'object': 'page', 'entry':
+    [{'id': '118754562014506', 'messaging':
+        [{'message': {
+            'seq': 215641,
+            'text': 'Hery',
+            'mid': 'mid.$cAABsAZUzq79k7ceQW1evIJBrvaFT'},
+            'recipient': {'id': '118754562014506'},
+            'timestamp': 1506401208411,
+            'sender': {'id': '1445499585482198'}}],
+      'time': 1506401208640}]}
+
+
 example_data2 = {'object': 'page', 'entry':
     [{'id': '118754562014506', 'messaging':
         [{'message': {
@@ -126,10 +138,11 @@ headers = {"Content-Type": "application/json"}
 
 url1 = "https://geo-coords-bot.appspot.com/fb-webhook/geo-coords-bot"
 url2 = "http://localhost:8080/fb-webhook/geo-coords-bot"
-r = requests.post(url1,
+r = requests.post(url2,
                       params=params,
                       headers=headers,
                       data=json.dumps(example_data3))
+r.json()
 print(r.text)
 
 
@@ -141,7 +154,7 @@ attachment_dict = [
                     }
                 }
             ]
-from util.util import AttachmentResponses
+#from util.uti5l import AttachmentResponses
 AR = AttachmentResponses(attachment_dict)
 
 AR.generate()
