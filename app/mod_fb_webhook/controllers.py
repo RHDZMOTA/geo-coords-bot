@@ -2,9 +2,9 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 from werkzeug import check_password_hash, generate_password_hash
 from app import app
 from app.mod_fb_webhook.models import ExampleModel, ExampleModel2
-
-from util.util import EntryManager
-from app.mod_fb_webhook.services import FacebookWebHook
+import json
+#from util.util import EntryManager
+from app.mod_fb_webhook.services import FacebookWebHook, EntryManager
 import settings.config as config
 
 
@@ -14,9 +14,13 @@ mod_fb_webhook = Blueprint('fb-webhook', __name__, url_prefix='/fb-webhook')
 @mod_fb_webhook.route('/test-model/<name>', methods=['GET'])
 def test_model(name=""):
     m1 = ExampleModel2(name=name).build()
+    m2 = ExampleModel2(name=name+"2").build()
+    m3 = ExampleModel2(name=name+"3").build()
     model = ExampleModel(
         name=name,
-        sub_model=m1).build()
+        sub_model=m1,
+        sub_model_list=[m2.key(), m3.key()]
+    ).build()
     return model.jsonify()
 
 
@@ -36,5 +40,5 @@ def post_web_hook():
         for entry in data["entry"]:
             messages = EntryManager(entry).send_messages()
             messages_list.append(messages)
-    return jsonify({"message_list": messages_list}), 200
+    return json.dumps({"message_list": messages_list}), 200#jsonify({"message_list": messages_list}), 200
 
